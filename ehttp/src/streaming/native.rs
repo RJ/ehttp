@@ -51,12 +51,16 @@ pub fn fetch_streaming_blocking(
     if on_data(Ok(Part::Response(response))).is_break() {
         return;
     };
-
+    const CHUNK_SIZE_LIMIT: usize = 4096;
     let mut reader = resp.into_reader();
     loop {
-        let mut buf = vec![0; 2048];
+        // BUG: chunks larger than this will be fragmented:
+        let mut buf = vec![0; CHUNK_SIZE_LIMIT];
         match reader.read(&mut buf) {
             Ok(n) if n > 0 => {
+                if n == CHUNK_SIZE_LIMIT {
+                    eprintln!("chunk size limit reached, possible fragmentation of chunk at {CHUNK_SIZE_LIMIT} bytes");
+                }
                 // clone data from buffer and clear it
                 let chunk = buf[..n].to_vec();
                 if on_data(Ok(Part::Chunk(chunk))).is_break() {

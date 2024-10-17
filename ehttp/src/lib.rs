@@ -73,10 +73,7 @@ pub async fn fetch_async(request: Request) -> Result<Response> {
 }
 
 mod types;
-pub use types::{Error, Headers, PartialResponse, Request, Response, Result};
-
-#[cfg(target_arch = "wasm32")]
-pub use types::Mode;
+pub use types::{Error, Headers, Mode, PartialResponse, Request, Response, Result};
 
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
